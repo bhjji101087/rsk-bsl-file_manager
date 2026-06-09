@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ development, main ]
+  push:
+    branches: [ development, main ]
+
+jobs:
+  build-test:
+    # Windows is required to build the net462 target.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup Node (for Azurite)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Start Azurite (Blob integration backend)
+        shell: pwsh
+        run: |
+          npm install -g azurite
+          Start-Process azurite-blob -ArgumentList '--silent','--location','$env:RUNNER_TEMP\azurite' -WindowStyle Hidden
+          Start-Sleep -Seconds 3
+
+      - name: Restore
+        run: dotnet restore RSK.FileManager.sln
+
+      # Warnings-as-errors + the CA2007 (ConfigureAwait) analyzer make a missed
+      # ConfigureAwait(false) fail the build here.
+      - name: Build (all TFMs, Release)
+        run: dotnet build RSK.FileManager.sln -c Release --no-restore
+
+      - name: Test with coverage
+        run: >
+          dotnet test RSK.FileManager.sln -c Release --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory ${{ github.workspace }}/coverage
+
+      - name: Enforce coverage gate (>= 85%)
+        shell: pwsh
+        run: python ${{ github.workspace }}/build/check-coverage.py ${{ github.workspace }}/coverage 85
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ${{ github.workspace }}/coverage

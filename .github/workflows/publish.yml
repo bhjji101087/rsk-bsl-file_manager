@@ -1,0 +1,49 @@
+name: Publish
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write   # create the GitHub release
+  packages: write   # push to GitHub Packages
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore RSK.FileManager.sln
+
+      - name: Build (all TFMs, Release)
+        run: dotnet build RSK.FileManager.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test RSK.FileManager.sln -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack RSK.FileManager.sln -c Release --no-build -o ${{ github.workspace }}/artifacts
+
+      - name: Push to GitHub Packages
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget add source "https://nuget.pkg.github.com/bhjji101087/index.json" `
+            --name github --username bhjji101087 --password $env:GH_TOKEN --store-password-in-clear-text
+          dotnet nuget push "${{ github.workspace }}/artifacts/*.nupkg" `
+            --source github --api-key $env:GH_TOKEN --skip-duplicate
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: ${{ github.workspace }}/artifacts/*.nupkg
