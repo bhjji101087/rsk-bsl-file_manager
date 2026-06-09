@@ -20,6 +20,4 @@
     <ProjectReference Include="..\..\src\RSK.FileManager.Abstractions\RSK.FileManager.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\RSK.FileManager.Core\RSK.FileManager.Core.csproj" />
     <ProjectReference Include="..\..\src\RSK.FileManager.FileSystem\RSK.FileManager.FileSystem.csproj" />
-  </ItemGroup>
-
-</Project>
+    <ProjectReference Inclu
