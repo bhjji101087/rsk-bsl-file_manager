@@ -1,0 +1,26 @@
+<Project>
+
+  <!-- Shared build settings for every project in the repository. -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <Company>RSK</Company>
+    <Authors>RSK Development Team</Authors>
+    <Product>RSK FileManager</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <!--
+    PolySharp injects the compiler-required types that back 'required' / 'init'
+    on down-level TFMs (net462, netstandard2.0, net6.0):
+      IsExternalInit, RequiredMemberAttribute, CompilerFeatureRequiredAttribute, etc.
+    PrivateAssets="all" makes it a build-only dependency that is NOT exposed to consumers.
+  -->
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
