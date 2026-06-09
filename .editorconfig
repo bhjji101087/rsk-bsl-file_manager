@@ -1,0 +1,30 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{cs}]
+indent_size = 4
+
+# Require XML docs on public members in src (CS1591 would otherwise only warn).
+dotnet_diagnostic.CS1591.severity = warning
+
+# Async hygiene — flag awaits that do not use ConfigureAwait(false) in library code.
+# (CA2007 ships with the .NET analyzers; enforced as an error in src projects.)
+dotnet_diagnostic.CA2007.severity = error
+
+# Test projects legitimately block/await on test contexts — do not require ConfigureAwait there.
+[tests/**.cs]
+dotnet_diagnostic.CA2007.severity = none
+
+[*.{xml,csproj,props,targets,json}]
+indent_size = 2
+
+[*.{cs}]
+# Prefer file-scoped namespaces, expression bodies where natural, var when apparent.
+csharp_style_namespace_declarations = file_scoped:suggestion
+dotnet_sort_system_directives_first = true

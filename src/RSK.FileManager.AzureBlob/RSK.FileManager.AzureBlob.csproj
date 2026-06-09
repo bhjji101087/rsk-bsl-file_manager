@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net462;netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <PackageId>RSK.FileManager.AzureBlob</PackageId>
+    <Description>Azure Blob Storage provider for RSK.FileManager (SAS, User Delegation SAS, Polly retry).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RSK.FileManager.Abstractions\RSK.FileManager.Abstractions.csproj" />
+    <ProjectReference Include="..\RSK.FileManager.Core\RSK.FileManager.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
+    <PackageReference Include="Azure.Identity" Version="1.12.1" />
+    <PackageRefer

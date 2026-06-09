@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net462;netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <PackageId>RSK.FileManager.Core</PackageId>
+    <Description>
+      Shared building blocks for RSK.FileManager providers: path sanitization,
+      file validation (size, extension, magic-byte content sniffing) and the
+      provider base class. Sits above Abstractions and below the providers.
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RSK.FileManager.Abstractions\RSK.FileManager.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
