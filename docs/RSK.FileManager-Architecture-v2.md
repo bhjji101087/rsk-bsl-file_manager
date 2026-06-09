@@ -54,6 +54,9 @@ The solution ships as a package family rather than one assembly. This makes Open
 
 ```
 RSK.FileManager.Abstractions      ← interface, models, options, exceptions. Apps reference THIS.
+        ▲
+        │
+RSK.FileManager.Core              ← PathSanitizer, FileValidator, FileManagerProviderBase
         ▲           ▲
         │           │
 RSK.FileManager.AzureBlob   RSK.FileManager.FileSystem
@@ -65,11 +68,16 @@ RSK.FileManager (registration glue: AddFileManager + FileManagerFactory; referen
 RSK.FileManager.AspNetCore  ← MapFileManagerFileServer() endpoint + health checks (net6.0/net8.0)
 ```
 
+> **Why Core exists.** The shared security primitives and provider base class are used *by* the
+> providers, so they cannot live in the glue package that *references* the providers (that would
+> be circular). `RSK.FileManager.Core` sits just above Abstractions and below the providers.
+
 | Package | TFMs | Responsibility | Key dependencies |
 |---|---|---|---|
 | `RSK.FileManager.Abstractions` | net462; netstandard2.0; net6.0; net8.0 | `IFileManagerService`, request/response models, `FileManagerOptions`, exception hierarchy | `Microsoft.Extensions.Logging.Abstractions` only |
-| `RSK.FileManager.AzureBlob` | net462; netstandard2.0; net6.0; net8.0 | `AzureBlobProvider`, SAS generation, Polly retry | `Azure.Storage.Blobs`, `Polly` |
-| `RSK.FileManager.FileSystem` | net462; netstandard2.0; net6.0; net8.0 | `FileSystemProvider`, HMAC token service | none beyond Abstractions |
+| `RSK.FileManager.Core` | net462; netstandard2.0; net6.0; net8.0 | `PathSanitizer`, `FileValidator` (size/extension/magic-byte sniffing), `FileManagerProviderBase` | Abstractions only |
+| `RSK.FileManager.AzureBlob` | net462; netstandard2.0; net6.0; net8.0 | `AzureBlobProvider`, SAS generation, Polly retry | `Azure.Storage.Blobs`, `Azure.Identity`, `Polly`, Core |
+| `RSK.FileManager.FileSystem` | net462; netstandard2.0; net6.0; net8.0 | `FileSystemProvider`, `FileSystemTokenService` (HMAC) | Core only |
 | `RSK.FileManager` | net462; netstandard2.0; net6.0; net8.0 | `AddFileManager()` (Core DI) + `FileManagerFactory` (net462); selects provider by config; references both providers | the two providers |
 | `RSK.FileManager.AspNetCore` | net6.0; net8.0 | `MapFileManagerFileServer()` file-serving endpoint, `AddFileManagerHealthCheck()` | ASP.NET Core |
 
@@ -109,8 +117,13 @@ RSK.FileManager/
 │   │   │   ├── FileManagerProviderException.cs
 │   │   │   ├── FileManagerTransientException.cs
 │   │   │   └── FileManagerConfigException.cs
-│   │   ├── Polyfills.cs (or PolySharp package ref)
 │   │   └── RSK.FileManager.Abstractions.csproj
+│   │
+│   ├── RSK.FileManager.Core/                     ← shared primitives (below providers)
+│   │   ├── Security/PathSanitizer.cs
+│   │   ├── Security/FileValidator.cs            ← extension + size + magic-byte sniffing
+│   │   ├── Providers/FileManagerProviderBase.cs
+│   │   └── RSK.FileManager.Core.csproj
 │   │
 │   ├── RSK.FileManager.AzureBlob/
 │   │   ├── AzureBlobProvider.cs
@@ -123,9 +136,6 @@ RSK.FileManager/
 │   │   └── RSK.FileManager.FileSystem.csproj
 │   │
 │   ├── RSK.FileManager/                          ← registration glue
-│   │   ├── Providers/Base/FileManagerProviderBase.cs
-│   │   ├── Security/PathSanitizer.cs
-│   │   ├── Security/FileValidator.cs            ← extension + size + magic-byte sniffing
 │   │   ├── Extensions/ServiceCollectionExtensions.cs   ← AddFileManager
 │   │   ├── Legacy/FileManagerFactory.cs         ← net462 manual factory
 │   │   └── RSK.FileManager.csproj
@@ -152,7 +162,7 @@ RSK.FileManager/
 └── README.md
 ```
 
-> **Note.** `PathSanitizer`, `FileValidator` and `FileManagerProviderBase` live in the glue package `RSK.FileManager` (shared by both providers) rather than in Abstractions, to keep Abstractions free of logic. If you prefer the providers to be usable without the glue package, move these into a tiny `RSK.FileManager.Core` shared package that both providers reference. Either is acceptable; the plan assumes the former.
+> **Note.** `PathSanitizer`, `FileValidator` and `FileManagerProviderBase` live in `RSK.FileManager.Core`, which sits above Abstractions and below the providers. This keeps Abstractions a pure contract and avoids the circular reference that would arise if these shared, provider-consumed types lived in the glue package (which references the providers).
 
 ---
 
@@ -958,15 +968,4 @@ All packages in the family share one version number per release for simplicity.
 2. **Package split** into Abstractions + AzureBlob + FileSystem + glue + AspNetCore (§4).
 3. **Secure URLs corrected**: Service SAS (key) vs User Delegation SAS (MSI, 7-day cap); explicit expiry rule (`>0`/`0`/`<0`) with MSI-never-expire rejected at startup (§11).
 4. **HMAC hardened**: path+expiry signed, `FixedTimeEquals`, URL-safe Base64; serving endpoint shipped (§11.4).
-5. **`ConfigureAwait(false)`** mandated + analyzer; removed the `async void` recommendation (§14).
-6. **`DownloadAsync`** now returns disposable, lose-nothing `FileDownloadResult` (§6/§7).
-7. **Magic-byte content sniffing** moved into v1.0 (§12.2).
-8. **Empty-folder cleanup** is opt-in, off by default (§13.2).
-9. **PolySharp** polyfills for `required`/`init` on down-level TFMs (§18).
-10. **Polly** (lean) instead of Microsoft.Extensions.Resilience.
-11. **Singleton storage client** reuse to avoid socket exhaustion (§13.1).
-12. Path cap set to **250**; logger categories made provider-specific; binding-redirect risk documented.
-
----
-
-*Prepared by RSK Solution Architecture. Approved for Phase 1.*
+5. **`ConfigureAwait(false)`** mandated + analyzer; removed the `async 
