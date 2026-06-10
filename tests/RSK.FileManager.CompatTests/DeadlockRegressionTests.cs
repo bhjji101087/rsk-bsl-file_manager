@@ -65,8 +65,12 @@ public sealed class DeadlockRegressionTests
                 }
             });
 
+            // xUnit1031: blocking here is intentional — this test verifies the library
+            // does not deadlock when a caller blocks synchronously.
+#pragma warning disable xUnit1031
             worker.Wait(TimeSpan.FromSeconds(15)).Should()
                 .BeTrue("the library must not deadlock when blocked under a single-threaded SynchronizationContext");
+#pragma warning restore xUnit1031
 
             context.PostCount.Should()
                 .Be(0, "no continuation should post back to the captured context (ConfigureAwait(false) everywhere)");

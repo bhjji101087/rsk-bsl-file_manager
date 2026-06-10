@@ -17,4 +17,14 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="FluentAssertions" Version="6.12.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.8"
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <!-- Azurite is launched via Docker in CI; tests connect to the well-known dev endpoint. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RSK.FileManager\RSK.FileManager.csproj" />
+    <ProjectReference Include="..\..\src\RSK.FileManager.AspNetCore\RSK.FileManager.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

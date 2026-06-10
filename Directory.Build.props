@@ -19,4 +19,11 @@
   <!--
     PolySharp injects the compiler-required types that back 'required' / 'init'
     on down-level TFMs (net462, netstandard2.0, net6.0):
-      IsExternalInit, RequiredMemberAttribute, CompilerFeatureRequiredAttribute, et
+      IsExternalInit, RequiredMemberAttribute, CompilerFeatureRequiredAttribute, etc.
+    PrivateAssets="all" makes it a build-only dependency that is NOT exposed to consumers.
+  -->
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

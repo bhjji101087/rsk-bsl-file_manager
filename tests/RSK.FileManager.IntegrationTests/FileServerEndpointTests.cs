@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RSK.FileManager;
 using RSK.FileManager.Abstractions;
 using RSK.FileManager.AspNetCore;
+using RSK.FileManager.Extensions;
 using Xunit;
 
 namespace RSK.FileManager.IntegrationTests;

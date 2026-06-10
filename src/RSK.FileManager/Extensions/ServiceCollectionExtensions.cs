@@ -6,7 +6,7 @@ using RSK.FileManager.Abstractions;
 using RSK.FileManager.AzureBlob;
 using RSK.FileManager.FileSystem;
 
-namespace RSK.FileManager;
+namespace RSK.FileManager.Extensions;
 
 /// <summary>
 /// DI registration for RSK.FileManager (.NET Core / .NET 5+).
