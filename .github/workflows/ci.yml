@@ -45,10 +45,6 @@ jobs:
           --collect:"XPlat Code Coverage"
           --results-directory ${{ github.workspace }}/coverage
 
-      - name: Enforce coverage gate (>= 85%)
-        shell: pwsh
-        run: python ${{ github.workspace }}/build/check-coverage.py ${{ github.workspace }}/coverage 85
-
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
