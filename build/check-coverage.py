@@ -15,6 +15,7 @@ def main() -> int:
     minimum = float(sys.argv[2]) if len(sys.argv) > 2 else 85.0
 
     files = glob.glob(os.path.join(coverage_dir, "**", "coverage.cobertura.xml"), recursive=True)
+    files += glob.glob(os.path.join(coverage_dir, "**", "Cobertura.xml"), recursive=True)
     if not files:
         print(f"No coverage files found under '{coverage_dir}'.")
         return 1

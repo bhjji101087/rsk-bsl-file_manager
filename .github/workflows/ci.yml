@@ -45,9 +45,18 @@ jobs:
           --collect:"XPlat Code Coverage"
           --results-directory ${{ github.workspace }}/coverage
 
+      - name: Merge coverage reports
+        shell: pwsh
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          & "$env:USERPROFILE\.dotnet\tools\reportgenerator.exe" `
+            "-reports:${{ github.workspace }}/coverage/**/coverage.cobertura.xml" `
+            "-targetdir:${{ github.workspace }}/coverage/merged" `
+            "-reporttypes:Cobertura"
+
       - name: Enforce coverage gate (>= 85%)
         shell: pwsh
-        run: python ${{ github.workspace }}/build/check-coverage.py ${{ github.workspace }}/coverage 85
+        run: python ${{ github.workspace }}/build/check-coverage.py ${{ github.workspace }}/coverage/merged 85
 
       - name: Upload coverage artifact
         if: always()
