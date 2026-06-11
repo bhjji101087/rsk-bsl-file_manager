@@ -39,8 +39,9 @@ jobs:
         run: |
           dotnet nuget add source "https://nuget.pkg.github.com/bhjji101087/index.json" `
             --name github --username bhjji101087 --password $env:GH_TOKEN --store-password-in-clear-text
-          dotnet nuget push "${{ github.workspace }}/artifacts/*.nupkg" `
-            --source github --api-key $env:GH_TOKEN --skip-duplicate
+          Get-ChildItem -Path "${{ github.workspace }}/artifacts" -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --source github --api-key $env:GH_TOKEN --skip-duplicate
+          }
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
