@@ -2,9 +2,9 @@ using System.IO;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RSK.FileManager;
 using RSK.FileManager.Abstractions;
 using RSK.FileManager.AzureBlob;
+using RSK.FileManager.Extensions;
 using RSK.FileManager.FileSystem;
 using Xunit;
 

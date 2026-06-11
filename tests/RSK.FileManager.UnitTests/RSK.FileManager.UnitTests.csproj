@@ -15,9 +15,16 @@
     <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\RSK.FileManager.Abstractions\RSK.FileManager.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\RSK.File
+    <ProjectReference Include="..\..\src\RSK.FileManager.Core\RSK.FileManager.Core.csproj" />
+    <ProjectReference Include="..\..\src\RSK.FileManager.FileSystem\RSK.FileManager.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\RSK.FileManager.AzureBlob\RSK.FileManager.AzureBlob.csproj" />
+    <ProjectReference Include="..\..\src\RSK.FileManager\RSK.FileManager.csproj" />
+  </ItemGroup>
+
+</Project>
